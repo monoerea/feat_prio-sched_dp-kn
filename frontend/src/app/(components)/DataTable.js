@@ -2,10 +2,10 @@ import React from 'react';
 
 const DataTable = ({ data, displayRowCount }) => {
     return (
-        <div className="overflow-y-auto max-h-96">
-            <table className="border-collapse border border-gray-400 text-sm">
+        <div className="overflow-y-auto max-h-96 bg-slate-800 rounded-lg pt-3">
+            <table className="border-collapse border border-slate-500 text-sm">
                 <thead>
-                    <tr className="bg-gray-700">
+                    <tr className="bg-slate-700">
                         {Object.keys(data[0]).map((header, index) => (
                             <th key={index} className="border border-gray-400 px-3 py-1">
                                 {header}

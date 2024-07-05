@@ -81,18 +81,19 @@ def run_service():
         data = pd.read_csv(filepath)
         app.logger.info("Data loaded successfully")
        
+        target = next((col for col in ['target', 'label', 'churn'] if col in data.columns), 'target')
 
         preprocessor = Pipeline([
             ('cleaner', DataCleaner(strategy='mean', exclude_columns=None)),  
-            ('transformer', DataTransformer(num_features=40, num_init_feats=40, exclude_columns=['churn'])),  # Example parameters
+            ('transformer', DataTransformer(num_features=5, num_init_feats=40, exclude_columns=[target])),  # Example parameters
         ])
         data = preprocessor.transform(data)
         app.logger.info('Preprocessor loaded successfully')
         app.logger.info("Data preprocessed successfully")
         app.logger.info(data.columns)
 
-        y = data['churn']  # Assuming 'churn' is your target variable
-        X = data.drop(columns=['churn'])  # Drop 'churn' column as it's the target variable
+        y = data[target]  # Assuming 'churn' is your target variable
+        X = data.drop(columns=[target])  # Drop 'churn' column as it's the target variable
         # Split data into train and test
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         app.logger.info("Data split into train and test sets")
@@ -133,7 +134,7 @@ def run_pipeline(X_train, X_test, y_train, y_test):
         app.logger.debug(f"Scheduler results: {scheduler.results}")
 
         # Knapsack Transformation
-        kn = Knapsack(scheduler.results['costs'], scheduler.results['values'], 0.1)
+        kn = Knapsack(scheduler.results['costs'], scheduler.results['values'], .1)
         final = kn.transform(X_train)
         app.logger.info("Knapsack transformation completed.")
 
@@ -157,11 +158,12 @@ def run_pipeline(X_train, X_test, y_train, y_test):
 
         app.logger.info("Metrics calculated.")
 
+        
         return {
-            'accuracy': accuracy,
-            'f1_score': f1,
-            'precision': precision,
-            'recall': recall
+            'accuracy': round(accuracy,5),
+            'f1_score': round(f1,5),
+            'precision': round(precision,5),
+            'recall': round(recall,5)
         }
 
     except Exception as e:
@@ -187,11 +189,12 @@ def evaluate_manual_input():
 
         # Make prediction using the trained model
         prediction = rfa.predict(input_df)
+        prediction_probability = rfa.predict_proba(input_df)
 
         # Log prediction for debugging
-        app.logger.debug(f"Prediction: {prediction}")
+        app.logger.debug(f"Prediction: {prediction},Prediction probablitiy: {prediction_probability} ")
 
-        return jsonify({'prediction': prediction.tolist()}), 200
+        return jsonify({'prediction': prediction.tolist(), 'probability':prediction_probability.tolist()}), 200
 
     except Exception as e:
         app.logger.error(f"Error in evaluating manual input: {str(e)}")

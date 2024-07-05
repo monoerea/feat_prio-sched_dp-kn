@@ -52,7 +52,7 @@ if __name__ == "__main__":
     print(scheduler.results)
     print('Completed')
 
-    kn = Knapsack(scheduler.results['costs'],scheduler.results['values'], 0.1)
+    kn = Knapsack(weights=scheduler.results['costs'], values=scheduler.results['values'], capacity=0.1)
     final=kn.transform(X_train)
     
     # Assuming `final` is the DataFrame with selected features from the knapsack algorithm

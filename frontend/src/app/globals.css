@@ -31,3 +31,26 @@ body {
     text-wrap: balance;
   }
 }
+/* Webkit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 8px; /* Adjust width for vertical scrollbar */
+  height: 8px; /* Adjust height for horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Transparent background for the track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
+  border: 2px solid transparent; /* Center the thumb within the track */
+  background-clip: padding-box; /* Clip the thumb to show the rounded corners */
+}
+
+label {
+  word-wrap: break-word;
+  min-height: 3rem; /* Fixed height for labels */
+  display: flex;
+  align-items: center;
+}
