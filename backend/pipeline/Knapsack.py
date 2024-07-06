@@ -31,32 +31,19 @@ class Knapsack:
         return self.t[n][capacity]
 
     def select_features_using_knapsack(self, X):
-        n = len(self.values)
-        T = [[-1 for _ in range(self.capacity + 1)] for _ in range(n + 1)]
-
-        # Initialize the matrix
-        for i in range(n + 1):
-            for w in range(self.capacity + 1):
-                if i == 0 or w == 0:
-                    T[i][w] = 0
-                elif self.weights[i-1] <= w:
-                    T[i][w] = max(self.values[i-1] + T[i-1][w-self.weights[i-1]], T[i-1][w])
-                else:
-                    T[i][w] = T[i-1][w]
-
         # Trace back the solution
-        res = T[self.n][self.capacity]
-        w = self.capacity
+        res = self.t[self.n][self.capacity]
+        print('RES',res)
         selected_items = []
         for i in range(self.n, 0, -1):
             if res <= 0:
                 break
-            if res == T[i-1][w]:
+            if res == self.t[i-1][self.capacity]:
                 continue
             else:
                 selected_items.append(i-1)
                 res = res - self.values[i-1]
-                w = w - self.weights[i-1]
+                self.capacity = self.capacity - self.weights[i-1]
 
         selected_items.reverse()
         selected_features = [X.columns[i] for i in selected_items]

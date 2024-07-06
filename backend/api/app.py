@@ -1,3 +1,4 @@
+import threading
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
@@ -119,6 +120,9 @@ def run_pipeline(X_train, X_test, y_train, y_test):
 
         # Initialize Scheduler
         scheduler = Scheduler()
+        scheduler_thread = threading.Thread(target=scheduler.run)
+        scheduler_thread.start()
+        
         pids = [i for i in range(10)]
 
         # Add processes to Scheduler
