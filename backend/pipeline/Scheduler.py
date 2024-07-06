@@ -1,4 +1,12 @@
+import threading
 import time
+
+from joblib import load
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+from backend.pipeline import FeatureSelector
 class PriorityQueue:
     """
     A simple priority queue implementation using a list.
@@ -119,34 +127,33 @@ class Scheduler:
         print(f"\nAverage Waiting Time: {avg_waiting_time}")
         print(f"Average Turnaround Time: {avg_turnaround_time}")
 if __name__ == "__main__":
-    print('bro')
-    # Load dataset and preprocess
-    # data = pd.read_csv('backend/data/dataset.csv')
-    # preprocessor = load('backend/scripts/preprocessor.joblib')
-    # data = preprocessor.fit_transform(data)
-    # y = data['churn']  # Assuming 'churn' is your target variable
-    # X = data.drop(columns=['churn'])  # Assuming 'churn' column is dropped for features
-    # feature_sizes = [100]
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    #Load dataset and preprocess
+    data = pd.read_csv('backend/data/dataset.csv')
+    preprocessor = load('backend/scripts/preprocessor.joblib')
+    data = preprocessor.fit_transform(data)
+    y = data['churn']  # Assuming 'churn' is your target variable
+    X = data.drop(columns=['churn'])  # Assuming 'churn' column is dropped for features
+    feature_sizes = [100]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-    # # Create the scheduler
-    # scheduler = Scheduler()
-    # scheduler_thread = threading.Thread(target=scheduler.run)
-    # scheduler_thread.start()
+    # Create the scheduler
+    scheduler = Scheduler()
+    scheduler_thread = threading.Thread(target=scheduler.run)
+    scheduler_thread.start()
 
-    # # Simulate adding processes dynamically in a loop
-    # try:
-    #     for i in range(2):
-    #         time.sleep(10)  # Simulate a 10-second interval before adding a new process
-    #         new_pid = len(scheduler.waiting_time) + 1
-    #         new_priority = 2  # Example priority (replace with actual logic)
-    #         feature_selector = FeatureSelector(model=RandomForestClassifier, cv=5)
-    #         feature_selector.run(X_train=X_train, y_train=y_train, feature_sizes=feature_sizes, step=50)
-    #         new_process = Process(new_pid, new_priority, feature_selector)
-    #         scheduler.add_process(new_process)
-    #         print(f"Added Process {new_pid} with priority {new_priority} and burst time {new_process.burst_time}")
-    # except KeyboardInterrupt:
-    #     print("\nKeyboardInterrupt: Stopping scheduler...")
-    #     scheduler.stop_periodic_process_arrival()
-    #     scheduler_thread.join()
-    #     print("Scheduler stopped.")
+    # Simulate adding processes dynamically in a loop
+    try:
+        for i in range(2):
+            time.sleep(10)  # Simulate a 10-second interval before adding a new process
+            new_pid = len(scheduler.waiting_time) + 1
+            new_priority = 2  # Example priority (replace with actual logic)
+            feature_selector = FeatureSelector(model=RandomForestClassifier, cv=5)
+            feature_selector.run(X_train=X_train, y_train=y_train, feature_sizes=feature_sizes, step=50)
+            new_process = Process(new_pid, new_priority, feature_selector)
+            scheduler.add_process(new_process)
+            print(f"Added Process {new_pid} with priority {new_priority} and burst time {new_process.burst_time}")
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt: Stopping scheduler...")
+        scheduler.stop_periodic_process_arrival()
+        scheduler_thread.join()
+        print("Scheduler stopped.")
