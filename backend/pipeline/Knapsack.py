@@ -14,7 +14,7 @@ class Knapsack:
         # Base condition
         if n == 0 or capacity == 0:
             return 0
-
+        
         # If the subproblem is already solved, return the stored result
         if self.t[n][capacity] != -1:
             return self.t[n][capacity]
@@ -33,7 +33,6 @@ class Knapsack:
     def select_features_using_knapsack(self, X):
         # Trace back the solution
         res = self.t[self.n][self.capacity]
-        print('RES',res)
         selected_items = []
         for i in range(self.n, 0, -1):
             if res <= 0:
@@ -85,7 +84,7 @@ def main():
     num_features = len(X.columns)
     weights = [random.uniform(0.1, 1.0) for _ in range(num_features)]
     values = [random.uniform(0.5, 1.0) for _ in range(num_features)]
-    capacity = .8#random.uniform(0.5, 1.0) * num_features  # Random capacity based on number of features
+    capacity = .1#random.uniform(0.5, 1.0) * num_features  # Random capacity based on number of features
 
     print(f"Randomized weights: {weights}")
     print(f"Randomized values: {values}")

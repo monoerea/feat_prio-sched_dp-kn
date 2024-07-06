@@ -6,7 +6,7 @@ class PriorityQueue:
     def __init__(self):
         self._queue = []
 
-    def push(self, priority, item):
+    def enqueue(self, priority, item):
         """
         Push an item with a priority into the queue.
         """
@@ -16,7 +16,7 @@ class PriorityQueue:
                 return
         self._queue.append((priority, item))
 
-    def pop(self):
+    def dequeue(self):
         """
         Pop the item with the highest priority from the queue.
         """
@@ -30,7 +30,7 @@ class PriorityQueue:
         """
         return len(self._queue) == 0
 class Process:
-    def __init__(self, pid, priority, process):
+    def __init__(self, pid, priority,process):
         self.pid = pid
         self.priority = priority
         self.burst_time = 0
@@ -52,15 +52,15 @@ class Scheduler:
         self.results = {'costs':[], 'values':[]}
 
     def add_process(self, process):
-        self.process_queue.push(process.priority, process)
+        self.process_queue.enqueue(process.priority, process)
 
     def run(self):
         self.running = True
-        time.sleep(0.01)
+        time.sleep(1)
         
         while self.running or not self.process_queue.empty():
             if not self.process_queue.empty():
-                current_process = self.process_queue.pop()
+                current_process = self.process_queue.dequeue()
                 print(f"Time {self.time}: Process {current_process.pid} is running")
                   # Small sleep to prevent busy waiting
                 start = time.time()
@@ -74,7 +74,7 @@ class Scheduler:
                     self.waiting_time[current_process.pid] = self.turn_around_time[current_process.pid] - current_process.burst_time
                 
                 else:
-                    self.process_queue.push(current_process.priority, current_process)
+                    self.process_queue.enqueue(current_process.priority, current_process)
             else:
                 self.stop()
             

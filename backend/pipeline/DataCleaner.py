@@ -35,10 +35,6 @@ class DataCleaner(BaseEstimator, TransformerMixin):
             self.num_imputer.fit(data[num_cols])
             data.loc[:, num_cols] = self.num_imputer.transform(data[num_cols])
         
-        # Exclude specified columns from processing
-        # columns_to_process = [col for col in data.columns if col not in self.exclude_columns]
-        # data_to_process = data[columns_to_process].copy()  # Use .copy() to avoid SettingWithCopyWarning
-        
         # Remove duplicates (if needed)
         data_cleaned = data.drop_duplicates()
 

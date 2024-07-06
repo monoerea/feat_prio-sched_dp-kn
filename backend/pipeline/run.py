@@ -42,8 +42,9 @@ if __name__ == "__main__":
     pids = [i for i in range(10)]
 
     for pid, priority, chunks in zip(pids,priorities, chunks):
+        time.sleep(.5)
         feat_selector = FeatureSelector(RandomForestClassifier, chunks, y_train, X_test, chunk_columns, feature_sizes)
-        process = Process(pid, priority,  feat_selector)
+        process = Process(pid, priority ,feat_selector)
         scheduler.add_process(process)
         print(f"Added Process {pid} with priority {priority}")
 
