@@ -24,6 +24,8 @@ class PriorityQueue:
             raise IndexError("pop from empty queue")
         return self._queue.pop(0)[1]
 
+    def peek(self):
+            return self._queue[0]
     def empty(self):
         """
         Check if the queue is empty.
@@ -63,24 +65,32 @@ class Scheduler:
         while self.running or not self.process_queue.empty():
             if not self.process_queue.empty():
                 current_process = self.process_queue.dequeue()
-                print(f"Time {self.time}: Process {current_process.pid} is running")
+                print(f"Time {self.time}: Process {current_process.pid} with priority {current_process.priority} is running")
 
                 start_time = time.time()
                 elapsed_time = 0
                 results = ()
                 while elapsed_time < current_process.burst_time and len(results)==0:
                     results = current_process.run()
+                    print(results)
                     # Increment time and elapsed_time
-                    self.time += elapsed_time
+                    self.time += 1
                     elapsed_time = time.time() - start_time
+
+                    # Check for higher priority processes
+                    if not self.process_queue.empty() and self.process_queue.peek()[0] < current_process.priority:
+                        print(f"Process {current_process.pid} preempted due to higher priority.")
+                        self.process_queue.enqueue(current_process.priority, current_process)
+                        return
 
                 costs, values = results
                 self.results['costs'].extend(costs)
                 self.results['values'].extend(values)
-                #print(costs, values, self.results)
                 print(len(self.results['costs']) == len(self.results['values']))
                 self.turn_around_time[current_process.pid] = elapsed_time
-                self.waiting_time[current_process.pid] = self.turn_around_time[current_process.pid] - current_process.burst_time
+                self.waiting_time[current_process.pid] = max(0, self.turn_around_time[current_process.pid] - current_process.burst_time)
+
+                print(f"Process {current_process.pid} finished. Turnaround Time: {self.turn_around_time[current_process.pid]}, Waiting Time: {self.waiting_time[current_process.pid]}")
 
             else:
                 self.stop()
@@ -108,7 +118,6 @@ class Scheduler:
 
         print(f"\nAverage Waiting Time: {avg_waiting_time}")
         print(f"Average Turnaround Time: {avg_turnaround_time}")
-
 if __name__ == "__main__":
     print('bro')
     # Load dataset and preprocess
