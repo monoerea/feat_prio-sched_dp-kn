@@ -29,17 +29,21 @@ class PriorityQueue:
         Check if the queue is empty.
         """
         return len(self._queue) == 0
+    
+import time
+
 class Process:
-    def __init__(self, pid, priority,process):
+    def __init__(self, pid, priority, burst_time, process):
         self.pid = pid
         self.priority = priority
-        self.burst_time = 0
+        self.burst_time = burst_time
         self.process = process
 
     def run(self):
-        print(f"Process {self.pid} finished")
-        return self.process.run()
-        
+        start_time = time.time()
+        results = self.process.run()
+        self.burst_time -= time.time() - start_time  # Decrease burst_time by elapsed real time
+        return results
 
 class Scheduler:
     def __init__(self):
@@ -48,8 +52,7 @@ class Scheduler:
         self.turn_around_time = {}
         self.process_queue = PriorityQueue()
         self.running = False
-        self.periodic_thread = None
-        self.results = {'costs':[], 'values':[]}
+        self.results = {'costs': [], 'values': []}
 
     def add_process(self, process):
         self.process_queue.enqueue(process.priority, process)
@@ -57,27 +60,30 @@ class Scheduler:
     def run(self):
         self.running = True
         time.sleep(1)
-        
         while self.running or not self.process_queue.empty():
             if not self.process_queue.empty():
                 current_process = self.process_queue.dequeue()
                 print(f"Time {self.time}: Process {current_process.pid} is running")
-                  # Small sleep to prevent busy waiting
-                start = time.time()
-                costs, values = current_process.run()
+
+                start_time = time.time()
+                elapsed_time = 0
+                results = ()
+                while elapsed_time < current_process.burst_time and len(results)==0:
+                    results = current_process.run()
+                    # Increment time and elapsed_time
+                    self.time += elapsed_time
+                    elapsed_time = time.time() - start_time
+
+                costs, values = results
                 self.results['costs'].extend(costs)
                 self.results['values'].extend(values)
-                print(costs, values, self.results)
+                #print(costs, values, self.results)
+                print(len(self.results['costs']) == len(self.results['values']))
+                self.turn_around_time[current_process.pid] = elapsed_time
+                self.waiting_time[current_process.pid] = self.turn_around_time[current_process.pid] - current_process.burst_time
 
-                if current_process.burst_time == 0:
-                    self.turn_around_time[current_process.pid] = time.time() - start
-                    self.waiting_time[current_process.pid] = self.turn_around_time[current_process.pid] - current_process.burst_time
-                
-                else:
-                    self.process_queue.enqueue(current_process.priority, current_process)
             else:
                 self.stop()
-            
 
         self.print_statistics()
         return self.results
@@ -103,7 +109,6 @@ class Scheduler:
         print(f"\nAverage Waiting Time: {avg_waiting_time}")
         print(f"Average Turnaround Time: {avg_turnaround_time}")
 
-# Example Usage
 if __name__ == "__main__":
     print('bro')
     # Load dataset and preprocess

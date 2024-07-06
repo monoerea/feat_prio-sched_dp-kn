@@ -12,7 +12,7 @@ from Scheduler import Process, Scheduler
 from Knapsack import Knapsack
 from TaskDispatcher import TaskDispatcher
 from FeatureSelector import FeatureSelector
-
+import random
 # Example Usage
 if __name__ == "__main__":
     # Load dataset and preprocess
@@ -42,9 +42,9 @@ if __name__ == "__main__":
     pids = [i for i in range(10)]
 
     for pid, priority, chunks in zip(pids,priorities, chunks):
-        time.sleep(.5)
+        time.sleep(.7)
         feat_selector = FeatureSelector(RandomForestClassifier, chunks, y_train, X_test, chunk_columns, feature_sizes)
-        process = Process(pid, priority ,feat_selector)
+        process = Process(pid, priority , random.randint(1,10),feat_selector)
         scheduler.add_process(process)
         print(f"Added Process {pid} with priority {priority}")
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     scheduler_thread.join()
     print(scheduler.results)
     print('Completed')
-
+    print(len(scheduler.results['costs']) == len(scheduler.results['values']))
     kn = Knapsack(weights=scheduler.results['costs'], values=scheduler.results['values'], capacity=0.1)
     final=kn.transform(X_train)
     
